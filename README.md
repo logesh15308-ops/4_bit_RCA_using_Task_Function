@@ -20,51 +20,130 @@ Vivado 2023.1
 # 4 bit Ripple Adder using Task
 // 4-bit Ripple Carry Adder using Task 
 ```
-module ripple_adder_task ( input [3:0] A, B, input Cin, output reg [3:0] Sum, output reg Cout ); reg c; integer i;
+
+`timescale 1ns / 1ps
+
+module rca_4_bit ( A, B, cin, sum, cout);
+
+input [3:0] A, B;
+input cin;
+output reg [3:0] sum;
+output reg cout;
+reg c; 
+integer i;
+
 task full_adder;
     input a, b, cin;
     output s, cout;
     begin
-    ///
+        s = a ^ b ^ cin;
+        cout = (a & b) | (b & cin) | (cin & a);
     end
 endtask
 
 always @(*) 
 begin
-    c = Cin;
+    c = cin;
     for (i = 0; i < 4; i = i + 1) begin
-        full_adder(A[i], B[i], c, Sum[i], c);
+        full_adder(A[i], B[i], c, sum[i], c);
     end
-    Cout = c;
+    cout = c;
 end
 endmodule
+
 ```
 Test Bench
+```
 
+`timescale 1ns / 1ps
+
+module rca_4_bit_tb;
+
+reg [3:0] a_t,b_t;
+reg cin_t;
+wire [3:0] sum_t;
+wire cout_t;
+
+rca_4_bit dut (a_t,b_t,cin_t,sum_t,cout_t);
+
+initial
+begin
+    a_t = 4'b1010;
+    b_t = 4'b0110;
+    cin_t = 1'b0;
+    #10;
+    a_t = 4'b0111;
+    b_t = 4'b1100;
+    cin_t = 1'b1;
+    #10;
+    $finish;
+end
+endmodule
+
+
+```
 # Output Waveform
 
-------------------------------PASTE THE OUTPUT---------------------------------
+
+<img width="1723" height="937" alt="image" src="https://github.com/user-attachments/assets/8dc66fb3-9c87-40a4-b872-92eb4ea905bf" />
 
 # 4 bit Ripple counter using Function
 // 4-bit Ripple Counter using Function 
 ```
-module ripple_counter_func ( input clk, rst, output reg [3:0] Q );
-function [3:0] count;
- ///
-endfunction
 
-always @(posedge clk or posedge rst) begin
+`timescale 1ns / 1ps
+
+module ripple_counter_4_bit( clk, rst, Q );
+input clk, rst;
+output reg [3:0] Q;
+always @(posedge clk or posedge rst) 
+begin
     if (rst)
         Q <= 4'b0000;
     else
-        Q <= count(Q);  // use function to increment
+        Q <= count(Q);
 end
+
+function [3:0] count;
+input [3:0] q;
+begin
+    count = q +1'b1;
+end
+endfunction
+
 endmodule
+
 ```
 Test Bench
+```
+
+`timescale 1ns / 1ps
+
+module ripple_counter_4_bit_tb;
+
+reg clk_t,rst_t;
+wire [3:0] q_t;
+
+ripple_counter_4_bit dut (clk_t, rst_t, q_t);
+
+initial
+begin
+    rst_t = 1'b1;
+    clk_t = 1'b0;
+    #100;
+    rst_t = 1'b0;
+    #1600;
+    $finish;
+end
+always #50 clk_t = ~clk_t;
+endmodule
+
+```
 
 # Output Waveform
-------------------------------PASTE THE OUTPUT---------------------------------
+
+<img width="1724" height="932" alt="image" src="https://github.com/user-attachments/assets/68da49a1-6fe6-4e92-a47a-e7ca7540146e" />
+
 
 # Conclusion
 In this experiment, a 4-bit-Ripple-counter-using-Function-and-4-bit-Ripple-Adder-using-task was successfully designed and simulated using Verilog HDL.
